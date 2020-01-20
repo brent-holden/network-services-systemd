@@ -1,0 +1,17 @@
+[Unit]
+Description=FluentD Log Aggregator
+After=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+ExecStartPre=-/usr/bin/podman rm -f fluentd
+ExecStart=/usr/bin/podman run --security-opt label=disable --rm --name fluentd --net=host -v /opt/fluentd/etc:/fluentd/etc -v /opt/fluentd/data:/fluentd/log fluentd_elasticsearch/fluentd
+ExecStop=/usr/bin/podman stop fluentd
+ExecReload=/usr/bin/podman restart fluentd
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

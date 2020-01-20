@@ -1,0 +1,17 @@
+[Unit]
+Description=Kibana UI
+After=elastic.service
+
+[Service]
+Type=simple
+User=root
+Group=root
+ExecStartPre=-/usr/bin/podman rm -f kibana
+ExecStart=/usr/bin/podman run --security-opt label=disable --name kibana --rm --net=host elastic/kibana:7.5.1
+ExecStop=/usr/bin/podman stop kibana
+ExecReload=/usr/bin/podman restart kibana
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

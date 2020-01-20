@@ -1,0 +1,17 @@
+[Unit]
+Description=Pi-Hole
+After=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+ExecStartPre=-/usr/bin/podman rm -f pihole
+ExecStart=/usr/bin/podman run --security-opt label=disable --name=pihole --mount type=bind,source=/opt/pihole/etc,target=/etc/pihole --mount type=bind,source=/opt/pihole/dnsmasq.d,target=/etc/dnsmasq.d,bind-propagation=rslave --systemd=false --cap-add=NET_ADMIN --net=host --dns=127.0.0.1 --dns=1.1.1.1 -e ServerIP=192.168.0.2 -e INTERFACE="enp0s20f0" -e DNSMASQ_LISTENING=all -e TZ=America/New_York --rm pihole/pihole
+ExecStop=/usr/bin/podman stop pihole
+ExecReload=/usr/bin/podman restart pihole
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

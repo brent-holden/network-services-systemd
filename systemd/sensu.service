@@ -1,0 +1,17 @@
+[Unit]
+Description=Sensu Monitoring
+After=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+ExecStartPre=-/usr/bin/podman rm -f sensu
+ExecStart=/usr/bin/podman run --security-opt label=disable --rm -v /opt/sensu:/var/lib/sensu --name sensu --net=host sensu/sensu:latest sensu-backend start --state-dir /var/lib/sensu/sensu-backend
+ExecStop=/usr/bin/podman stop sensu
+ExecReload=/usr/bin/podman restart sensu
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target
